@@ -3,6 +3,7 @@ package org.photoedit.remote.repository
 import android.content.Context
 import android.content.SharedPreferences
 import org.photoedit.remote.model.GalleryImage
+import androidx.core.content.edit
 
 class
 GalleryRepository(context: Context) {
@@ -16,7 +17,7 @@ GalleryRepository(context: Context) {
         return stored.split(SEPARATOR).mapNotNull { entry ->
             val sep = entry.indexOf('|')
             if (sep > 0) GalleryImage(
-                id = entry.substring(0, sep),
+                id = entry.take(sep),
                 uri = entry.substring(sep + 1)
             ) else null
         }
@@ -26,7 +27,7 @@ GalleryRepository(context: Context) {
         val entry = "${image.id}|${image.uri}"
         val current = prefs.getString(KEY_URIS, "") ?: ""
         val updated = if (current.isBlank()) entry else "$entry$SEPARATOR$current"
-        prefs.edit().putString(KEY_URIS, updated).apply()
+        prefs.edit { putString(KEY_URIS, updated) }
     }
 
     fun removeImage(id: String) {
@@ -34,7 +35,7 @@ GalleryRepository(context: Context) {
         val updated = current.split(SEPARATOR)
             .filter { !it.startsWith("$id|") }
             .joinToString(SEPARATOR)
-        prefs.edit().putString(KEY_URIS, updated).apply()
+        prefs.edit { putString(KEY_URIS, updated) }
     }
 
     companion object {

@@ -1,7 +1,6 @@
 package org.photoedit.remote.ui
 
 import android.content.res.Configuration
-import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTransformGestures
@@ -30,6 +29,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 
@@ -47,7 +47,7 @@ fun EditScreen(
     val image: @Composable (Modifier) -> Unit = { mod ->
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data(Uri.parse(imageUri))
+                .data(imageUri.toUri())
                 .crossfade(true)
                 .build(),
             contentDescription = null,

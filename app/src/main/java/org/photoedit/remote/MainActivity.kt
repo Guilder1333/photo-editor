@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import org.photoedit.remote.ui.EditScreen
 import org.photoedit.remote.ui.GalleryScreen
-import org.photoedit.remote.ui.theme.RemotephotoeditingTheme
+import org.photoedit.remote.ui.theme.RemotePhotoEditorTheme
 import org.photoedit.remote.viewmodel.GalleryViewModel
 
 class MainActivity : ComponentActivity() {
@@ -20,7 +20,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            RemotephotoeditingTheme {
+            RemotePhotoEditorTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     val viewModel: GalleryViewModel = viewModel()
                     val currentEditImage by viewModel.currentEditImage.collectAsState()

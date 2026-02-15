@@ -13,7 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Help
+import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
@@ -39,10 +39,10 @@ private data class MenuItem(
 )
 
 private val menuItems = listOf(
-    MenuItem(Icons.Default.Tune,     "Filter",      {}),
-    MenuItem(Icons.Default.Settings, "Preferences", {}),
-    MenuItem(Icons.Default.Info,     "About",       {}),
-    MenuItem(Icons.Default.Help,     "Help",        {}),
+    MenuItem(Icons.Default.Tune,     "Filter") {},
+    MenuItem(Icons.Default.Settings, "Preferences") {},
+    MenuItem(Icons.Default.Info,     "About") {},
+    MenuItem(Icons.AutoMirrored.Filled.Help,     "Help") {},
 )
 
 @Composable

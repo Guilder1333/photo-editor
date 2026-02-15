@@ -40,8 +40,8 @@ private data class EditMenuItem(
 )
 
 private val editMenuItems = listOf(
-    EditMenuItem(Icons.Default.Tune,    "Adjustments",      {}),
-    EditMenuItem(Icons.Default.Palette, "Color Correction", {}),
+    EditMenuItem(Icons.Default.Tune,    "Adjustments") {},
+    EditMenuItem(Icons.Default.Palette, "Color Correction") {},
 )
 
 @Composable

@@ -39,6 +39,7 @@ import coil.request.ImageRequest
 import org.photoedit.remote.model.GalleryImage
 import org.photoedit.remote.viewmodel.GalleryViewModel
 import org.photoedit.remote.viewmodel.SelectionState
+import androidx.core.net.toUri
 
 @Composable
 fun GalleryScreen(
@@ -170,7 +171,7 @@ private fun GalleryThumbnail(
     ) {
         AsyncImage(
             model = ImageRequest.Builder(context)
-                .data(Uri.parse(image.uri))
+                .data(image.uri.toUri())
                 .crossfade(true)
                 .build(),
             contentDescription = null,
