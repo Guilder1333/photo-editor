@@ -28,6 +28,9 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
     private val _selection = MutableStateFlow(SelectionState())
     val selection: StateFlow<SelectionState> = _selection.asStateFlow()
 
+    private val _currentEditImage = MutableStateFlow<GalleryImage?>(null)
+    val currentEditImage: StateFlow<GalleryImage?> = _currentEditImage.asStateFlow()
+
     init {
         _images.value = repository.loadImages()
     }
@@ -70,6 +73,14 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
 
     fun clearSelection() {
         _selection.value = SelectionState()
+    }
+
+    fun openImage(id: String) {
+        _currentEditImage.value = _images.value.find { it.id == id }
+    }
+
+    fun closeImage() {
+        _currentEditImage.value = null
     }
 
     fun removeImage(id: String) {

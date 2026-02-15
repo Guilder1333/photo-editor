@@ -6,6 +6,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Android photo gallery + editing app with AI-powered inpainting via AUTOMATIC1111 Stable Diffusion WebUI API. Targets Android 14+ (minSdk 35).
 
+## Workflow
+
+The user runs all builds, tests, and checks themselves. Do not run `./gradlew` or any build/test commands to verify changes.
+
 ## Build Commands
 
 ```bash
@@ -50,7 +54,9 @@ MainActivity
 | `ui/GalleryScreen.kt` | Main screen: adaptive grid, FAB for image picker, long-press selection mode |
 | `ui/MenuPanel.kt` | Hamburger menu — always shows icons; expand reveals labels. Landscape = left sidebar, portrait = top bar |
 | `ui/SelectionPanel.kt` | Bottom bar shown during multi-select (count + delete) |
-| `viewmodel/GalleryViewModel.kt` | Gallery state (`images`, `selection`), URI permission handling |
+| `ui/EditScreen.kt` | Full-screen image editor with pinch-zoom (focal-point aware) and pan |
+| `ui/EditMenuPanel.kt` | Editor tool menu — opposite side from back button. Landscape = right sidebar, portrait = bottom bar |
+| `viewmodel/GalleryViewModel.kt` | Gallery state (`images`, `selection`, `currentEditImage`), URI permission handling |
 | `repository/GalleryRepository.kt` | SharedPreferences persistence for gallery URIs |
 | `model/GalleryImage.kt` | `data class GalleryImage(id: String, uri: String)` |
 

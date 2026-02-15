@@ -34,7 +34,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import org.photoedit.remote.model.GalleryImage
@@ -43,7 +42,8 @@ import org.photoedit.remote.viewmodel.SelectionState
 
 @Composable
 fun GalleryScreen(
-    viewModel: GalleryViewModel = viewModel()
+    viewModel: GalleryViewModel,
+    onOpenImage: (String) -> Unit
 ) {
     val images by viewModel.images.collectAsState()
     val selection by viewModel.selection.collectAsState()
@@ -89,6 +89,7 @@ fun GalleryScreen(
                     selection = selection,
                     onLongClick = { viewModel.enterSelectionMode(it) },
                     onTap = { viewModel.toggleSelection(it) },
+                    onOpen = onOpenImage,
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -104,6 +105,7 @@ fun GalleryScreen(
                     selection = selection,
                     onLongClick = { viewModel.enterSelectionMode(it) },
                     onTap = { viewModel.toggleSelection(it) },
+                    onOpen = onOpenImage,
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -117,6 +119,7 @@ private fun GalleryGrid(
     selection: SelectionState,
     onLongClick: (String) -> Unit,
     onTap: (String) -> Unit,
+    onOpen: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyVerticalGrid(
@@ -132,7 +135,8 @@ private fun GalleryGrid(
                 isSelected = image.id in selection.selectedIds,
                 isSelectionMode = selection.active,
                 onLongClick = { onLongClick(image.id) },
-                onTap = { onTap(image.id) }
+                onTap = { onTap(image.id) },
+                onOpen = { onOpen(image.id) }
             )
         }
     }
@@ -145,7 +149,8 @@ private fun GalleryThumbnail(
     isSelected: Boolean,
     isSelectionMode: Boolean,
     onLongClick: () -> Unit,
-    onTap: () -> Unit
+    onTap: () -> Unit,
+    onOpen: () -> Unit
 ) {
     val context = LocalContext.current
     val borderColor = MaterialTheme.colorScheme.primary
@@ -156,7 +161,7 @@ private fun GalleryThumbnail(
             .aspectRatio(1f)
             .combinedClickable(
                 onLongClick = onLongClick,
-                onClick = { if (isSelectionMode) onTap() }
+                onClick = { if (isSelectionMode) onTap() else onOpen() }
             )
             .then(
                 if (isSelected) Modifier.border(3.dp, borderColor)
