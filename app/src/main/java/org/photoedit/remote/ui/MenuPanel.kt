@@ -93,51 +93,43 @@ fun MenuPanel(
             }
         }
     } else {
-        // Top panel — always shows icons in header row; expands to show labels below
+        // Top panel — always shows icons; expands to show labels below each icon
         Column(
             modifier = modifier
                 .fillMaxWidth()
                 .animateContentSize(tween(200))
                 .background(background)
         ) {
-            // Header row — always visible with all icons
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp)
                     .padding(horizontal = 8.dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.Top
             ) {
-                IconButton(onClick = { expanded = !expanded }) {
+                IconButton(
+                    onClick = { expanded = !expanded },
+                    modifier = Modifier.size(56.dp)
+                ) {
                     Icon(Icons.Default.Menu, contentDescription = "Menu", tint = tint)
                 }
                 menuItems.forEach { item ->
-                    IconButton(onClick = item.onClick) {
-                        Icon(item.icon, contentDescription = item.label, tint = tint)
-                    }
-                }
-            }
-
-            if (expanded) {
-                menuItems.forEach { item ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(48.dp)
-                            .padding(horizontal = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Icon(item.icon, contentDescription = item.label, tint = tint,
-                            modifier = Modifier.size(24.dp))
-                        Text(
-                            text = item.label,
-                            style = MaterialTheme.typography.labelLarge,
-                            color = tint
-                        )
+                        IconButton(onClick = item.onClick) {
+                            Icon(item.icon, contentDescription = item.label, tint = tint)
+                        }
+                        if (expanded) {
+                            Text(
+                                text = item.label,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = tint,
+                                modifier = Modifier.padding(bottom = 8.dp)
+                            )
+                        }
                     }
                 }
-                Spacer(Modifier.height(8.dp))
             }
         }
     }
