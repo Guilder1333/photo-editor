@@ -49,7 +49,9 @@ val defaultEditTools: List<EditTool> = listOf(AdjustmentsTool, ColorCorrectionTo
 @Composable
 fun EditMenuPanel(
     modifier: Modifier = Modifier,
-    tools: List<EditTool> = defaultEditTools
+    tools: List<EditTool> = defaultEditTools,
+    temperature: Float = 0f,
+    onTemperatureChange: (Float) -> Unit = {}
 ) {
     var selectedIndex by remember { mutableStateOf<Int?>(null) }
     val selectedTool = selectedIndex?.let { tools.getOrNull(it) }
@@ -85,7 +87,14 @@ fun EditMenuPanel(
                         .weight(1f)
                         .fillMaxWidth()
                     ) {
-                        selectedTool.Content()
+                        if (selectedTool == ColorCorrectionTool) {
+                            ColorCorrectionTool.Content(
+                                temperature = temperature,
+                                onTemperatureChange = onTemperatureChange
+                            )
+                        } else {
+                            selectedTool.Content()
+                        }
                     }
                 }
             }
@@ -125,8 +134,8 @@ fun EditMenuPanel(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(160.dp)
-                        .padding(12.dp)
+                        .height(280.dp)
+                        .padding(horizontal = 12.dp, vertical = 8.dp)
                 ) {
                     Text(
                         text = selectedTool.label,
@@ -138,7 +147,14 @@ fun EditMenuPanel(
                         .weight(1f)
                         .fillMaxWidth()
                     ) {
-                        selectedTool.Content()
+                        if (selectedTool == ColorCorrectionTool) {
+                            ColorCorrectionTool.Content(
+                                temperature = temperature,
+                                onTemperatureChange = onTemperatureChange
+                            )
+                        } else {
+                            selectedTool.Content()
+                        }
                     }
                 }
             }
