@@ -53,7 +53,9 @@ fun EditMenuPanel(
     temperature: Float = 0f,
     onTemperatureChange: (Float) -> Unit = {},
     tint: Float = 0f,
-    onTintChange: (Float) -> Unit = {}
+    onTintChange: (Float) -> Unit = {},
+    vibrance: Float = 0f,
+    onVibranceChange: (Float) -> Unit = {}
 ) {
     var selectedIndex by remember { mutableStateOf<Int?>(null) }
     val selectedTool = selectedIndex?.let { tools.getOrNull(it) }
@@ -94,7 +96,9 @@ fun EditMenuPanel(
                                 temperature = temperature,
                                 onTemperatureChange = onTemperatureChange,
                                 tint = tint,
-                                onTintChange = onTintChange
+                                onTintChange = onTintChange,
+                                vibrance = vibrance,
+                                onVibranceChange = onVibranceChange
                             )
                         } else {
                             selectedTool.Content()
@@ -156,7 +160,9 @@ fun EditMenuPanel(
                                 temperature = temperature,
                                 onTemperatureChange = onTemperatureChange,
                                 tint = tint,
-                                onTintChange = onTintChange
+                                onTintChange = onTintChange,
+                                vibrance = vibrance,
+                                onVibranceChange = onVibranceChange
                             )
                         } else {
                             selectedTool.Content()

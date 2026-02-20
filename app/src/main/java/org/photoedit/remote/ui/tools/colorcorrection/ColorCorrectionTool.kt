@@ -34,9 +34,10 @@ object ColorCorrectionTool : EditTool {
         temperature: Float,
         onTemperatureChange: (Float) -> Unit,
         tint: Float,
-        onTintChange: (Float) -> Unit
+        onTintChange: (Float) -> Unit,
+        vibrance: Float,
+        onVibranceChange: (Float) -> Unit
     ) {
-        var vibrance by remember { mutableFloatStateOf(0f) }
         var saturation by remember { mutableFloatStateOf(0f) }
 
         Column(modifier = Modifier.fillMaxWidth()) {
@@ -53,7 +54,7 @@ object ColorCorrectionTool : EditTool {
             ColorSlider(
                 label = "Vibrance",
                 value = vibrance,
-                onValueChange = { vibrance = it }
+                onValueChange = onVibranceChange
             )
             ColorSlider(
                 label = "Saturation",

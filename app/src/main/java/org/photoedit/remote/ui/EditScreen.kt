@@ -38,6 +38,7 @@ private fun ZoomableImage(
     imageUri: String,
     temperature: Float,
     tint: Float,
+    vibrance: Float,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -78,6 +79,7 @@ private fun ZoomableImage(
         update = { view ->
             val colorMatrix = createTemperatureMatrix(temperature)
             colorMatrix.postConcat(createTintMatrix(tint))
+            colorMatrix.postConcat(createVibranceMatrix(vibrance))
             val paint = Paint().apply {
                 colorFilter = ColorMatrixColorFilter(colorMatrix)
             }
@@ -117,6 +119,21 @@ private fun createTemperatureMatrix(temperature: Float): ColorMatrix {
     }
 }
 
+private fun createVibranceMatrix(vibrance: Float): ColorMatrix {
+    // Vibrance selectively boosts muted colors more than already-saturated ones.
+    // Approximated with a saturation matrix using R/B-biased luma weights (vR=0.5, vG=0.0, vB=0.5)
+    // so the effect is strongest on hues that don't contain much green (reds, blues, purples).
+    val sat = 1f + vibrance / 100f * 0.5f
+    val vR = 0.5f; val vG = 0.0f; val vB = 0.5f
+    val array = floatArrayOf(
+        vR * (1f - sat) + sat, vG * (1f - sat),         vB * (1f - sat),         0f, 0f,
+        vR * (1f - sat),       vG * (1f - sat) + sat,   vB * (1f - sat),         0f, 0f,
+        vR * (1f - sat),       vG * (1f - sat),         vB * (1f - sat) + sat,   0f, 0f,
+        0f,                    0f,                      0f,                      1f, 0f
+    )
+    return ColorMatrix(array)
+}
+
 private fun createTintMatrix(tint: Float): ColorMatrix {
     // Tint range: -100 (green) to +100 (magenta)
     // Positive tint (magenta): boost R and B, suppress G
@@ -140,6 +157,7 @@ fun EditScreen(
 
     var temperature by remember { mutableFloatStateOf(0f) }
     var tint by remember { mutableFloatStateOf(0f) }
+    var vibrance by remember { mutableFloatStateOf(0f) }
 
     val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
 
@@ -154,6 +172,7 @@ fun EditScreen(
                     imageUri = imageUri,
                     temperature = temperature,
                     tint = tint,
+                    vibrance = vibrance,
                     modifier = Modifier.fillMaxSize()
                 )
                 IconButton(
@@ -173,7 +192,9 @@ fun EditScreen(
                 temperature = temperature,
                 onTemperatureChange = { temperature = it },
                 tint = tint,
-                onTintChange = { tint = it }
+                onTintChange = { tint = it },
+                vibrance = vibrance,
+                onVibranceChange = { vibrance = it }
             )
         }
     } else {
@@ -187,6 +208,7 @@ fun EditScreen(
                     imageUri = imageUri,
                     temperature = temperature,
                     tint = tint,
+                    vibrance = vibrance,
                     modifier = Modifier.fillMaxSize()
                 )
                 IconButton(
@@ -206,7 +228,9 @@ fun EditScreen(
                 temperature = temperature,
                 onTemperatureChange = { temperature = it },
                 tint = tint,
-                onTintChange = { tint = it }
+                onTintChange = { tint = it },
+                vibrance = vibrance,
+                onVibranceChange = { vibrance = it }
             )
         }
     }
