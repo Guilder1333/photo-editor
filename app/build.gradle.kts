@@ -1,3 +1,7 @@
+@file:Suppress("DEPRECATION")
+
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -33,14 +37,17 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = rootProject.extra["kotlinJvmTarget"] as String
-    }
     buildFeatures {
         compose = true
     }
     buildToolsVersion = "36.0.0"
     ndkVersion = "27.0.12077973"
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget = JvmTarget.fromTarget(rootProject.extra["kotlinJvmTarget"] as String)
+    }
 }
 
 dependencies {
