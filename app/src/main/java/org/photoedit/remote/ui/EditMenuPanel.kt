@@ -51,14 +51,16 @@ fun EditMenuPanel(
     modifier: Modifier = Modifier,
     tools: List<EditTool> = defaultEditTools,
     temperature: Float = 0f,
-    onTemperatureChange: (Float) -> Unit = {}
+    onTemperatureChange: (Float) -> Unit = {},
+    tint: Float = 0f,
+    onTintChange: (Float) -> Unit = {}
 ) {
     var selectedIndex by remember { mutableStateOf<Int?>(null) }
     val selectedTool = selectedIndex?.let { tools.getOrNull(it) }
 
     val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
     val background = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.85f)
-    val tint = MaterialTheme.colorScheme.onSurfaceVariant
+    val iconColor = MaterialTheme.colorScheme.onSurfaceVariant
     val activeTint = MaterialTheme.colorScheme.primary
 
     if (isLandscape) {
@@ -80,7 +82,7 @@ fun EditMenuPanel(
                     Text(
                         text = selectedTool.label,
                         style = MaterialTheme.typography.titleSmall,
-                        color = tint,
+                        color = iconColor,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
                     Box(modifier = Modifier
@@ -90,7 +92,9 @@ fun EditMenuPanel(
                         if (selectedTool == ColorCorrectionTool) {
                             ColorCorrectionTool.Content(
                                 temperature = temperature,
-                                onTemperatureChange = onTemperatureChange
+                                onTemperatureChange = onTemperatureChange,
+                                tint = tint,
+                                onTintChange = onTintChange
                             )
                         } else {
                             selectedTool.Content()
@@ -114,7 +118,7 @@ fun EditMenuPanel(
                         Icon(
                             imageVector = tool.icon,
                             contentDescription = tool.hint,
-                            tint = if (selectedIndex == index) activeTint else tint,
+                            tint = if (selectedIndex == index) activeTint else iconColor,
                             modifier = Modifier.size(24.dp)
                         )
                     }
@@ -140,7 +144,7 @@ fun EditMenuPanel(
                     Text(
                         text = selectedTool.label,
                         style = MaterialTheme.typography.titleSmall,
-                        color = tint,
+                        color = iconColor,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
                     Box(modifier = Modifier
@@ -150,7 +154,9 @@ fun EditMenuPanel(
                         if (selectedTool == ColorCorrectionTool) {
                             ColorCorrectionTool.Content(
                                 temperature = temperature,
-                                onTemperatureChange = onTemperatureChange
+                                onTemperatureChange = onTemperatureChange,
+                                tint = tint,
+                                onTintChange = onTintChange
                             )
                         } else {
                             selectedTool.Content()
@@ -175,7 +181,7 @@ fun EditMenuPanel(
                         Icon(
                             imageVector = tool.icon,
                             contentDescription = tool.hint,
-                            tint = if (selectedIndex == index) activeTint else tint
+                            tint = if (selectedIndex == index) activeTint else iconColor
                         )
                     }
                 }

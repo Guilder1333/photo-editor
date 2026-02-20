@@ -17,7 +17,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
@@ -28,9 +27,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import android.media.ExifInterface
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.net.toUri
+import androidx.exifinterface.media.ExifInterface
 import com.davemorrissey.labs.subscaleview.ImageSource
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 
@@ -38,6 +37,7 @@ import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 private fun ZoomableImage(
     imageUri: String,
     temperature: Float,
+    tint: Float,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -77,6 +77,7 @@ private fun ZoomableImage(
         factory = { ssiv },
         update = { view ->
             val colorMatrix = createTemperatureMatrix(temperature)
+            colorMatrix.postConcat(createTintMatrix(tint))
             val paint = Paint().apply {
                 colorFilter = ColorMatrixColorFilter(colorMatrix)
             }
@@ -116,6 +117,20 @@ private fun createTemperatureMatrix(temperature: Float): ColorMatrix {
     }
 }
 
+private fun createTintMatrix(tint: Float): ColorMatrix {
+    // Tint range: -100 (green) to +100 (magenta)
+    // Positive tint (magenta): boost R and B, suppress G
+    // Negative tint (green): suppress R and B, boost G
+    val t = tint / 100f * 0.3f
+    val array = floatArrayOf(
+        1f + t, 0f,     0f,     0f, 0f,
+        0f,     1f - t, 0f,     0f, 0f,
+        0f,     0f,     1f + t, 0f, 0f,
+        0f,     0f,     0f,     1f, 0f
+    )
+    return ColorMatrix(array)
+}
+
 @Composable
 fun EditScreen(
     imageUri: String,
@@ -124,6 +139,7 @@ fun EditScreen(
     BackHandler(onBack = onClose)
 
     var temperature by remember { mutableFloatStateOf(0f) }
+    var tint by remember { mutableFloatStateOf(0f) }
 
     val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
 
@@ -137,6 +153,7 @@ fun EditScreen(
                 ZoomableImage(
                     imageUri = imageUri,
                     temperature = temperature,
+                    tint = tint,
                     modifier = Modifier.fillMaxSize()
                 )
                 IconButton(
@@ -154,7 +171,9 @@ fun EditScreen(
             }
             EditMenuPanel(
                 temperature = temperature,
-                onTemperatureChange = { temperature = it }
+                onTemperatureChange = { temperature = it },
+                tint = tint,
+                onTintChange = { tint = it }
             )
         }
     } else {
@@ -167,6 +186,7 @@ fun EditScreen(
                 ZoomableImage(
                     imageUri = imageUri,
                     temperature = temperature,
+                    tint = tint,
                     modifier = Modifier.fillMaxSize()
                 )
                 IconButton(
@@ -184,7 +204,9 @@ fun EditScreen(
             }
             EditMenuPanel(
                 temperature = temperature,
-                onTemperatureChange = { temperature = it }
+                onTemperatureChange = { temperature = it },
+                tint = tint,
+                onTintChange = { tint = it }
             )
         }
     }

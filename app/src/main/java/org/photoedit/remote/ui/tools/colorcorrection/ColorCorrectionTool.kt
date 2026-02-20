@@ -2,11 +2,8 @@ package org.photoedit.remote.ui.tools.colorcorrection
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material3.MaterialTheme
@@ -35,9 +32,10 @@ object ColorCorrectionTool : EditTool {
     @Composable
     fun Content(
         temperature: Float,
-        onTemperatureChange: (Float) -> Unit
+        onTemperatureChange: (Float) -> Unit,
+        tint: Float,
+        onTintChange: (Float) -> Unit
     ) {
-        var tint by remember { mutableFloatStateOf(0f) }
         var vibrance by remember { mutableFloatStateOf(0f) }
         var saturation by remember { mutableFloatStateOf(0f) }
 
@@ -50,7 +48,7 @@ object ColorCorrectionTool : EditTool {
             ColorSlider(
                 label = "Tint",
                 value = tint,
-                onValueChange = { tint = it }
+                onValueChange = onTintChange
             )
             ColorSlider(
                 label = "Vibrance",
