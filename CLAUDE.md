@@ -31,21 +31,52 @@ The user runs all builds, tests, and checks themselves. Do not run `./gradlew` o
 
 ## Architecture
 
-Single-activity, fully Compose-based MVVM with Repository pattern.
+Single-activity, fully Compose-based MVVM with Repository pattern. No navigation library — `MainActivity` conditionally renders `GalleryScreen` or `EditScreen` based on `currentEditImage` state.
 
 ```
 MainActivity
-  └── GalleryScreen (Compose)
-        └── GalleryViewModel (AndroidViewModel)
-              └── GalleryRepository (SharedPreferences)
-                    └── GalleryImage (model)
+  ├── GalleryScreen                    ← image grid + picker
+  │     ├── MenuPanel                  ← hamburger menu (sidebar / top bar)
+  │     ├── GalleryGrid               ← LazyVerticalGrid of thumbnails
+  │     └── SelectionPanel             ← bottom bar during multi-select
+  │
+  └── EditScreen                       ← full-screen image editor
+        ├── ZoomableImage              ← SubsamplingScaleImageView via AndroidView
+        └── EditMenuPanel              ← tool sidebar / bottom bar
+              └── EditTool.Content()   ← active tool's UI panel
 ```
 
-**State management**: `StateFlow` in ViewModels, collected via `collectAsState()` in Compose.
+### Data flow
 
-**Persistence**: `GalleryRepository` stores image URIs in SharedPreferences as newline-separated `id|uri` strings. The ViewModel calls `takePersistableUriPermission()` when adding images so URIs remain accessible across app restarts.
+```
+User action → Composable callback → ViewModel method → Repository
+                                          ↓
+                              StateFlow update → recomposition
+```
 
-**Orientation handling**: `GalleryScreen` and `MenuPanel` both check `LocalConfiguration.current.orientation` to switch between portrait and landscape layouts. No separate Activities or Fragments are used.
+- `GalleryViewModel` (AndroidViewModel) owns all gallery state: `images`, `selection`, `currentEditImage`.
+- `GalleryRepository` persists image URIs in SharedPreferences as newline-separated `id|uri` strings.
+- `takePersistableUriPermission()` is called when adding images so content URIs survive app restarts.
+- Editor state (adjustment values like temperature, tint, vibrance) currently lives as local `remember` state in `EditScreen`, not in a ViewModel.
+- Image effects are applied via `ColorMatrix` + `ColorMatrixColorFilter` on the `SubsamplingScaleImageView`'s hardware layer paint — real-time preview, no bitmap copies.
+
+### Orientation handling
+
+Every screen checks `LocalConfiguration.current.orientation` and switches layout:
+- **Landscape**: `Row` — menu panels become sidebars (MenuPanel left, EditMenuPanel right)
+- **Portrait**: `Column` — menu panels become top/bottom bars
+
+No separate Activities, Fragments, or resource qualifiers.
+
+### Editor tool plugin system
+
+Tools implement the `EditTool` interface (`ui/tools/EditTool.kt`): `icon`, `label`, `hint`, and `@Composable Content()`. `EditMenuPanel` renders all registered tools via `defaultEditTools` list; selecting one opens its `Content()` in a sub-panel. Each tool lives in its own package under `ui/tools/`.
+
+Current tools:
+- `ui/tools/adjustments/` — placeholder (brightness, contrast planned)
+- `ui/tools/colorcorrection/` — temperature, tint, vibrance, saturation sliders
+
+To add a new tool: implement `EditTool` as an `object`, add it to `defaultEditTools` in `EditMenuPanel.kt`.
 
 ## Key Files
 
@@ -54,8 +85,11 @@ MainActivity
 | `ui/GalleryScreen.kt` | Main screen: adaptive grid, FAB for image picker, long-press selection mode |
 | `ui/MenuPanel.kt` | Hamburger menu — always shows icons; expand reveals labels. Landscape = left sidebar, portrait = top bar |
 | `ui/SelectionPanel.kt` | Bottom bar shown during multi-select (count + delete) |
-| `ui/EditScreen.kt` | Full-screen image editor with pinch-zoom (focal-point aware) and pan |
+| `ui/EditScreen.kt` | Full-screen image editor with pinch-zoom (focal-point aware), pan, and tool registration |
 | `ui/EditMenuPanel.kt` | Editor tool menu — opposite side from back button. Landscape = right sidebar, portrait = bottom bar |
+| `ui/tools/EditTool.kt` | Interface contract for editor tools (icon, label, hint, Content composable) |
+| `ui/tools/adjustments/` | Adjustments tool (brightness, contrast, etc.) |
+| `ui/tools/colorcorrection/` | Color correction tool (tint, vibrance, etc.) |
 | `viewmodel/GalleryViewModel.kt` | Gallery state (`images`, `selection`, `currentEditImage`), URI permission handling |
 | `repository/GalleryRepository.kt` | SharedPreferences persistence for gallery URIs |
 | `model/GalleryImage.kt` | `data class GalleryImage(id: String, uri: String)` |
@@ -76,7 +110,7 @@ MainActivity
 
 ## What Is Not Yet Implemented
 
-- Image editing (adjustments, masks, save)
+- Image editing: masks, save/export (adjustments and color correction tools exist but may not yet apply changes to the bitmap)
 - All `MenuPanel` item `onClick` handlers are empty `{}`
 - A1111 network layer
 - Hilt DI setup
