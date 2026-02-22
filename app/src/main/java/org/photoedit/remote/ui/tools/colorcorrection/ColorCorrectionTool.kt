@@ -10,10 +10,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
@@ -36,10 +32,10 @@ object ColorCorrectionTool : EditTool {
         tint: Float,
         onTintChange: (Float) -> Unit,
         vibrance: Float,
-        onVibranceChange: (Float) -> Unit
+        onVibranceChange: (Float) -> Unit,
+        saturation: Float,
+        onSaturationChange: (Float) -> Unit
     ) {
-        var saturation by remember { mutableFloatStateOf(0f) }
-
         Column(modifier = Modifier.fillMaxWidth()) {
             ColorSlider(
                 label = "Temperature",
@@ -59,7 +55,7 @@ object ColorCorrectionTool : EditTool {
             ColorSlider(
                 label = "Saturation",
                 value = saturation,
-                onValueChange = { saturation = it }
+                onValueChange = onSaturationChange
             )
         }
     }

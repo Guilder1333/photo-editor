@@ -32,6 +32,7 @@ import androidx.core.net.toUri
 import androidx.exifinterface.media.ExifInterface
 import com.davemorrissey.labs.subscaleview.ImageSource
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+import org.photoedit.remote.model.ImageAdjustments
 
 @Composable
 private fun ZoomableImage(
@@ -39,6 +40,7 @@ private fun ZoomableImage(
     temperature: Float,
     tint: Float,
     vibrance: Float,
+    saturation: Float,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -80,6 +82,7 @@ private fun ZoomableImage(
             val colorMatrix = createTemperatureMatrix(temperature)
             colorMatrix.postConcat(createTintMatrix(tint))
             colorMatrix.postConcat(createVibranceMatrix(vibrance))
+            colorMatrix.postConcat(createSaturationMatrix(saturation))
             val paint = Paint().apply {
                 colorFilter = ColorMatrixColorFilter(colorMatrix)
             }
@@ -148,16 +151,39 @@ private fun createTintMatrix(tint: Float): ColorMatrix {
     return ColorMatrix(array)
 }
 
+private fun createSaturationMatrix(saturation: Float): ColorMatrix {
+    // Saturation range: -100 (grayscale) to +100 (double saturation), 0 = unchanged.
+    // Maps to multiplier: -100 → 0.0, 0 → 1.0, 100 → 2.0
+    val sat = 1f + saturation / 100f
+    // Standard luma weights (BT.601)
+    val rw = 0.213f; val gw = 0.715f; val bw = 0.072f
+    val array = floatArrayOf(
+        rw * (1f - sat) + sat, gw * (1f - sat),         bw * (1f - sat),         0f, 0f,
+        rw * (1f - sat),       gw * (1f - sat) + sat,   bw * (1f - sat),         0f, 0f,
+        rw * (1f - sat),       gw * (1f - sat),         bw * (1f - sat) + sat,   0f, 0f,
+        0f,                    0f,                      0f,                      1f, 0f
+    )
+    return ColorMatrix(array)
+}
+
 @Composable
 fun EditScreen(
     imageUri: String,
+    initialAdjustments: ImageAdjustments = ImageAdjustments(),
+    onSave: (ImageAdjustments) -> Unit = {},
     onClose: () -> Unit
 ) {
-    BackHandler(onBack = onClose)
+    var temperature by remember { mutableFloatStateOf(initialAdjustments.temperature) }
+    var tint        by remember { mutableFloatStateOf(initialAdjustments.tint) }
+    var vibrance    by remember { mutableFloatStateOf(initialAdjustments.vibrance) }
+    var saturation  by remember { mutableFloatStateOf(initialAdjustments.saturation) }
 
-    var temperature by remember { mutableFloatStateOf(0f) }
-    var tint by remember { mutableFloatStateOf(0f) }
-    var vibrance by remember { mutableFloatStateOf(0f) }
+    val handleClose = {
+        onSave(ImageAdjustments(temperature, tint, vibrance, saturation))
+        onClose()
+    }
+
+    BackHandler(onBack = handleClose)
 
     val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
 
@@ -173,10 +199,11 @@ fun EditScreen(
                     temperature = temperature,
                     tint = tint,
                     vibrance = vibrance,
+                    saturation = saturation,
                     modifier = Modifier.fillMaxSize()
                 )
                 IconButton(
-                    onClick = onClose,
+                    onClick = handleClose,
                     modifier = Modifier
                         .align(Alignment.TopStart)
                         .padding(8.dp)
@@ -194,7 +221,9 @@ fun EditScreen(
                 tint = tint,
                 onTintChange = { tint = it },
                 vibrance = vibrance,
-                onVibranceChange = { vibrance = it }
+                onVibranceChange = { vibrance = it },
+                saturation = saturation,
+                onSaturationChange = { saturation = it }
             )
         }
     } else {
@@ -209,10 +238,11 @@ fun EditScreen(
                     temperature = temperature,
                     tint = tint,
                     vibrance = vibrance,
+                    saturation = saturation,
                     modifier = Modifier.fillMaxSize()
                 )
                 IconButton(
-                    onClick = onClose,
+                    onClick = handleClose,
                     modifier = Modifier
                         .align(Alignment.TopStart)
                         .padding(8.dp)
@@ -230,7 +260,9 @@ fun EditScreen(
                 tint = tint,
                 onTintChange = { tint = it },
                 vibrance = vibrance,
-                onVibranceChange = { vibrance = it }
+                onVibranceChange = { vibrance = it },
+                saturation = saturation,
+                onSaturationChange = { saturation = it }
             )
         }
     }

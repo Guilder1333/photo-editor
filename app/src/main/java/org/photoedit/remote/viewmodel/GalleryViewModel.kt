@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.photoedit.remote.model.GalleryImage
+import org.photoedit.remote.model.ImageAdjustments
 import org.photoedit.remote.repository.GalleryRepository
 import java.util.UUID
 
@@ -85,6 +86,11 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
 
     fun removeImage(id: String) {
         repository.removeImage(id)
+        _images.value = repository.loadImages()
+    }
+
+    fun saveAdjustments(id: String, adjustments: ImageAdjustments) {
+        repository.updateAdjustments(id, adjustments)
         _images.value = repository.loadImages()
     }
 }

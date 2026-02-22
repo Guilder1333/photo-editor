@@ -55,7 +55,9 @@ fun EditMenuPanel(
     tint: Float = 0f,
     onTintChange: (Float) -> Unit = {},
     vibrance: Float = 0f,
-    onVibranceChange: (Float) -> Unit = {}
+    onVibranceChange: (Float) -> Unit = {},
+    saturation: Float = 0f,
+    onSaturationChange: (Float) -> Unit = {}
 ) {
     var selectedIndex by remember { mutableStateOf<Int?>(null) }
     val selectedTool = selectedIndex?.let { tools.getOrNull(it) }
@@ -98,7 +100,9 @@ fun EditMenuPanel(
                                 tint = tint,
                                 onTintChange = onTintChange,
                                 vibrance = vibrance,
-                                onVibranceChange = onVibranceChange
+                                onVibranceChange = onVibranceChange,
+                                saturation = saturation,
+                                onSaturationChange = onSaturationChange
                             )
                         } else {
                             selectedTool.Content()
@@ -162,7 +166,9 @@ fun EditMenuPanel(
                                 tint = tint,
                                 onTintChange = onTintChange,
                                 vibrance = vibrance,
-                                onVibranceChange = onVibranceChange
+                                onVibranceChange = onVibranceChange,
+                                saturation = saturation,
+                                onSaturationChange = onSaturationChange
                             )
                         } else {
                             selectedTool.Content()

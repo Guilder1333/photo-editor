@@ -25,9 +25,12 @@ class MainActivity : ComponentActivity() {
                     val viewModel: GalleryViewModel = viewModel()
                     val currentEditImage by viewModel.currentEditImage.collectAsState()
 
-                    if (currentEditImage != null) {
+                    val editImage = currentEditImage
+                    if (editImage != null) {
                         EditScreen(
-                            imageUri = currentEditImage!!.uri,
+                            imageUri = editImage.uri,
+                            initialAdjustments = editImage.adjustments,
+                            onSave = { adj -> viewModel.saveAdjustments(editImage.id, adj) },
                             onClose = { viewModel.closeImage() }
                         )
                     } else {
