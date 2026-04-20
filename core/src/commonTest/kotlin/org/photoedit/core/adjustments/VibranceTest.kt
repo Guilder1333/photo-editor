@@ -80,7 +80,7 @@ class VibranceTest {
     // ── Clamp ─────────────────────────────────────────────────────────────────
 
     @Test
-    fun `output stays in [0, 1] for extreme positive vibrance`() {
+    fun `output stays in 0 to 1 for extreme positive vibrance`() {
         val out = Vibrance(1f).apply(px(0.8f, 0.1f, 0.5f)).pixels
         assertTrue(out[0] in 0f..1f && out[1] in 0f..1f && out[2] in 0f..1f)
     }

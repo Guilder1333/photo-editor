@@ -74,7 +74,7 @@ class SaturationTest {
     // ── Clamp ─────────────────────────────────────────────────────────────────
 
     @Test
-    fun `output stays in [0, 1] for extreme boost`() {
+    fun `output stays in 0 to 1 for extreme boost`() {
         val out = Saturation(3f).apply(px(1f, 0f, 0f)).pixels
         assertTrue(out[0] in 0f..1f && out[1] in 0f..1f && out[2] in 0f..1f)
     }

@@ -66,7 +66,7 @@ class HighlightsShadowsTest {
     // ── Clamp ─────────────────────────────────────────────────────────────────
 
     @Test
-    fun `output stays in [0, 1] for extreme Highlights`() {
+    fun `output stays in 0 to 1 for extreme Highlights`() {
         val out = Highlights(1f).apply(px(1f, 1f, 1f)).pixels
         assertTrue(out[0] in 0f..1f && out[1] in 0f..1f && out[2] in 0f..1f)
     }
@@ -174,7 +174,7 @@ class HighlightsShadowsTest {
     // ── Clamp ─────────────────────────────────────────────────────────────────
 
     @Test
-    fun `output stays in [0, 1] for extreme Shadows`() {
+    fun `output stays in 0 to 1 for extreme Shadows`() {
         val out = Shadows(1f).apply(px(0f, 0f, 0f)).pixels
         assertTrue(out[0] in 0f..1f && out[1] in 0f..1f && out[2] in 0f..1f)
     }

@@ -26,14 +26,14 @@ class TemperatureTest {
     // ── Direction ─────────────────────────────────────────────────────────────
 
     @Test
-    fun `positive value warms: R increases, B decreases`() {
+    fun `positive value warms R increases, B decreases`() {
         val out = Temperature(0.5f).apply(px(0.5f, 0.5f, 0.5f)).pixels
         assertTrue(out[0] > 0.5f, "R should increase (warmer)")
         assertTrue(out[2] < 0.5f, "B should decrease (warmer)")
     }
 
     @Test
-    fun `negative value cools: R decreases, B increases`() {
+    fun `negative value cools R decreases, B increases`() {
         val out = Temperature(-0.5f).apply(px(0.5f, 0.5f, 0.5f)).pixels
         assertTrue(out[0] < 0.5f, "R should decrease (cooler)")
         assertTrue(out[2] > 0.5f, "B should increase (cooler)")

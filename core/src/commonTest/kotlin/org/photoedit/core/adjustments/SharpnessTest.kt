@@ -69,7 +69,7 @@ class SharpnessTest {
     // ── Direction ─────────────────────────────────────────────────────────────
 
     @Test
-    fun `positive sharpness enhances edges: bright centre gets brighter, surround gets darker`() {
+    fun `positive sharpness enhances edges bright centre gets brighter, surround gets darker`() {
         val input = img3x3(bg = 0.5f, center = 0.8f)
         val out = Sharpness(0.5f).apply(input)
         assertTrue(centerValue(out) > 0.8f, "centre should be enhanced (brighter)")
