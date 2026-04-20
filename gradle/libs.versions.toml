@@ -1,0 +1,11 @@
+[versions]
+kotlin = "2.1.0"
+agp = "8.7.3"
+
+[libraries]
+# No external dependencies for core yet.
+# kotlinx-serialization will be added in a later step (§5 of the dev plan).
+
+[plugins]
+kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+androidLibrary = { id = "com.android.library", version.ref = "agp" }
