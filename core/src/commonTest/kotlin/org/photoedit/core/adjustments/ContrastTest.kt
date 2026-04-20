@@ -26,7 +26,7 @@ class ContrastTest {
     // ── Pivot ─────────────────────────────────────────────────────────────────
 
     @Test
-    fun `mid-grey (0·5) is invariant at any contrast value`() {
+    fun `mid-grey (0_5) is invariant at any contrast value`() {
         // (0.5 - PIVOT) * factor + PIVOT = 0 * factor + 0.5 = 0.5 always
         for (v in listOf(-1f, -0.5f, 0f, 0.5f, 1f)) {
             val out = Contrast(v).apply(px(0.5f, 0.5f, 0.5f)).pixels
@@ -102,7 +102,7 @@ class ContrastTest {
     //   out_B = (0.5 - 0.5) * 1.5 + 0.5 = 0 + 0.5 = 0.50 (pivot, unchanged)
 
     @Test
-    fun `golden - Contrast(0·5) on known pixel`() {
+    fun `golden - Contrast(0_5) on known pixel`() {
         val out = Contrast(0.5f).apply(px(0.8f, 0.2f, 0.5f)).pixels
         assertNear(0.95f, out[0], message = "R")
         assertNear(0.05f, out[1], message = "G")
@@ -111,12 +111,12 @@ class ContrastTest {
     }
 
     // Contrast(1.0) on (0.9, 0.1, 0.5) — factor = 2.0:
-    //   out_R = (0.9 - 0.5) * 2 + 0.5 = 0.8 + 0.5 = 1.3 → clamped to 1.0
-    //   out_G = (0.1 - 0.5) * 2 + 0.5 = -0.8 + 0.5 = -0.3 → clamped to 0.0
-    //   out_B = pivot → 0.5
+    //   out_R = (0.9 - 0.5) * 2 + 0.5 = 0.8 + 0.5 = 1.3 to clamped to 1.0
+    //   out_G = (0.1 - 0.5) * 2 + 0.5 = -0.8 + 0.5 = -0.3 to clamped to 0.0
+    //   out_B = pivot to 0.5
 
     @Test
-    fun `golden - Contrast(1·0) clamps extremes`() {
+    fun `golden - Contrast(1_0) clamps extremes`() {
         val out = Contrast(1f).apply(px(0.9f, 0.1f, 0.5f)).pixels
         assertNear(1.0f, out[0], message = "R clamped to 1")
         assertNear(0.0f, out[1], message = "G clamped to 0")

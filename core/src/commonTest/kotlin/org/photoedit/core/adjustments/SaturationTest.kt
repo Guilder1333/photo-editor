@@ -41,7 +41,7 @@ class SaturationTest {
 
     @Test
     fun `grey pixel is invariant regardless of saturation value`() {
-        // For grey R=G=B=lum, so (c - lum)=0 for all channels → no change
+        // For grey R=G=B=lum, so (c - lum)=0 for all channels to no change
         for (v in listOf(0f, 0.5f, 1f, 2f)) {
             val out = Saturation(v).apply(px(0.5f, 0.5f, 0.5f)).pixels
             assertNear(0.5f, out[0], message = "R at sat=$v")
@@ -81,7 +81,7 @@ class SaturationTest {
 
     @Test
     fun `negative value treated as 0 (greyscale floor)`() {
-        // Negative multiplier is clamped to 0 → same as Saturation(0)
+        // Negative multiplier is clamped to 0 to same as Saturation(0)
         val outNeg  = Saturation(-0.5f).apply(px(0.8f, 0.3f, 0.1f)).pixels
         val outZero = Saturation( 0.0f).apply(px(0.8f, 0.3f, 0.1f)).pixels
         assertContentEquals(outZero, outNeg)
@@ -114,7 +114,7 @@ class SaturationTest {
     //   out_B = 0.371 + (0.4 - 0.371) × 0.5 = 0.371 + 0.0145 = 0.3855
 
     @Test
-    fun `golden - Saturation(0·5) partial desaturation`() {
+    fun `golden - Saturation(0_5) partial desaturation`() {
         val out = Saturation(0.5f).apply(px(0.6f, 0.3f, 0.4f)).pixels
         assertNear(0.4855f, out[0], message = "R")
         assertNear(0.3355f, out[1], message = "G")
@@ -122,7 +122,7 @@ class SaturationTest {
         assertNear(1.0f,    out[3], message = "A")
     }
 
-    // Saturation(0) on pure red → greyscale luma = LUM_R = 0.2126
+    // Saturation(0) on pure red to greyscale luma = LUM_R = 0.2126
 
     @Test
     fun `golden - Saturation(0) pure red to greyscale`() {

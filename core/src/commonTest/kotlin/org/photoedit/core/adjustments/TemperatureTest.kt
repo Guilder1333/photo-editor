@@ -94,7 +94,7 @@ class TemperatureTest {
     //   out_B = 0.5 - 0.1 = 0.4
 
     @Test
-    fun `golden - Temperature(0·5) warms neutral grey`() {
+    fun `golden - Temperature(0_5) warms neutral grey`() {
         val out = Temperature(0.5f).apply(px(0.5f, 0.5f, 0.5f)).pixels
         assertNear(0.6f, out[0], message = "R")
         assertNear(0.5f, out[1], message = "G unchanged")
@@ -102,20 +102,20 @@ class TemperatureTest {
         assertNear(1.0f, out[3], message = "A")
     }
 
-    // Temperature(-0.5) on (0.5, 0.5, 0.5): R→0.4, G→0.5, B→0.6
+    // Temperature(-0.5) on (0.5, 0.5, 0.5): Rto0.4, Gto0.5, Bto0.6
 
     @Test
-    fun `golden - Temperature(-0·5) cools neutral grey`() {
+    fun `golden - Temperature(-0_5) cools neutral grey`() {
         val out = Temperature(-0.5f).apply(px(0.5f, 0.5f, 0.5f)).pixels
         assertNear(0.4f, out[0], message = "R")
         assertNear(0.5f, out[1], message = "G unchanged")
         assertNear(0.6f, out[2], message = "B")
     }
 
-    // Temperature(1.0) on (0.9, 0.5, 0.1): shift=0.2, R=1.1→1.0, B=-0.1→0.0
+    // Temperature(1.0) on (0.9, 0.5, 0.1): shift=0.2, R=1.1to1.0, B=-0.1to0.0
 
     @Test
-    fun `golden - Temperature(1·0) clamps at extremes`() {
+    fun `golden - Temperature(1_0) clamps at extremes`() {
         val out = Temperature(1f).apply(px(0.9f, 0.5f, 0.1f)).pixels
         assertNear(1.0f, out[0], message = "R clamped to 1")
         assertNear(0.5f, out[1], message = "G unchanged")

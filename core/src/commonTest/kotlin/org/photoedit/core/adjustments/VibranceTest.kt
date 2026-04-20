@@ -27,7 +27,7 @@ class VibranceTest {
 
     @Test
     fun `grey pixel (sat=0) is unchanged by vibrance of any value`() {
-        // For grey: R=G=B=lum, so (c - lum)=0 → boost is irrelevant
+        // For grey: R=G=B=lum, so (c - lum)=0 to boost is irrelevant
         for (v in listOf(-1f, -0.5f, 0f, 0.5f, 1f)) {
             val out = Vibrance(v).apply(px(0.5f, 0.5f, 0.5f)).pixels
             assertNear(0.5f, out[0], message = "R at vibrance=$v")
@@ -38,7 +38,7 @@ class VibranceTest {
 
     @Test
     fun `fully-saturated pixel (sat=1) is unchanged by positive vibrance`() {
-        // Pure red: sat = max(1,0,0) - min(1,0,0) = 1 → boost = 1 + value*(1-1) = 1
+        // Pure red: sat = max(1,0,0) - min(1,0,0) = 1 to boost = 1 + value*(1-1) = 1
         val out = Vibrance(1f).apply(px(1f, 0f, 0f)).pixels
         // lum = LUM_R; out_R = lum + (1-lum)*1 = 1; out_G = lum + (0-lum)*1 = 0
         assertNear(1.0f, out[0], message = "R")
@@ -71,8 +71,8 @@ class VibranceTest {
     fun `positive vibrance amplifies colour deviation from luma`() {
         val input = px(0.7f, 0.3f, 0.5f)
         val out = Vibrance(0.5f).apply(input).pixels
-        // R is above luma → should move further from luma (higher)
-        // G is below luma → should move further from luma (lower)
+        // R is above luma to should move further from luma (higher)
+        // G is below luma to should move further from luma (lower)
         assertTrue(out[0] > 0.7f || out[0] == 1f)
         assertTrue(out[1] < 0.3f || out[1] == 0f)
     }
@@ -115,7 +115,7 @@ class VibranceTest {
     //   out_B = 0.34922 + (0.5 - 0.34922) × 1.2 = 0.34922 + 0.18094 = 0.5302
 
     @Test
-    fun `golden - Vibrance(0·5) on semi-saturated pixel`() {
+    fun `golden - Vibrance(0_5) on semi-saturated pixel`() {
         val out = Vibrance(0.5f).apply(px(0.8f, 0.2f, 0.5f)).pixels
         assertNear(0.8902f, out[0], epsilon = 0.002f, message = "R")
         assertNear(0.1702f, out[1], epsilon = 0.002f, message = "G")

@@ -34,7 +34,7 @@ class HighlightsShadowsTest {
     // ── Boundary at lum = 0.5 ─────────────────────────────────────────────────
 
     @Test
-    fun `Highlights does not affect mid-grey (lum = 0·5, influence = 0)`() {
+    fun `Highlights does not affect mid-grey (lum = 0_5, influence = 0)`() {
         // influence = max(0, 0.5×2 - 1) = 0
         val out = Highlights(0.5f).apply(px(0.5f, 0.5f, 0.5f)).pixels
         assertNear(0.5f, out[0], message = "R at boundary")
@@ -43,8 +43,8 @@ class HighlightsShadowsTest {
     }
 
     @Test
-    fun `Highlights does not affect dark pixel (lum below 0·5)`() {
-        // lum = 0.2 → influence = max(0, 0.2×2-1) = 0
+    fun `Highlights does not affect dark pixel (lum below 0_5)`() {
+        // lum = 0.2 to influence = max(0, 0.2×2-1) = 0
         val input = px(0.2f, 0.2f, 0.2f)
         assertContentEquals(input.pixels, Highlights(0.8f).apply(input).pixels)
     }
@@ -92,12 +92,12 @@ class HighlightsShadowsTest {
     // ── Golden pixel tests ────────────────────────────────────────────────────
     //
     // Highlights(0.5) on pure white (1, 1, 1, 1):
-    //   lum = 1.0 → influence = max(0, 1×2−1) = 1.0
+    //   lum = 1.0 to influence = max(0, 1×2−1) = 1.0
     //   reduction = 0.5 × 1.0 × 0.5 = 0.25
     //   out = 1.0 − 0.25 = 0.75
 
     @Test
-    fun `golden - Highlights(0·5) pulls down pure white`() {
+    fun `golden - Highlights(0_5) pulls down pure white`() {
         val out = Highlights(0.5f).apply(px(1f, 1f, 1f)).pixels
         assertNear(0.75f, out[0], message = "R")
         assertNear(0.75f, out[1], message = "G")
@@ -105,21 +105,21 @@ class HighlightsShadowsTest {
         assertNear(1.0f,  out[3], message = "A")
     }
 
-    // Highlights(1.0) on white: reduction = 1×1×0.5 = 0.5 → out = 0.5
+    // Highlights(1.0) on white: reduction = 1×1×0.5 = 0.5 to out = 0.5
 
     @Test
-    fun `golden - Highlights(1·0) on white → 0·5`() {
+    fun `golden - Highlights(1_0) on white to 0_5`() {
         val out = Highlights(1f).apply(px(1f, 1f, 1f)).pixels
         assertNear(0.5f, out[0], message = "R at max recovery")
     }
 
     // Highlights(0.5) on slightly-bright pixel (0.8, 0.8, 0.8):
-    //   lum = 0.8 → influence = max(0, 0.8×2−1) = 0.6
+    //   lum = 0.8 to influence = max(0, 0.8×2−1) = 0.6
     //   reduction = 0.5 × 0.6 × 0.5 = 0.15
     //   out = 0.8 − 0.15 = 0.65
 
     @Test
-    fun `golden - Highlights(0·5) on bright-grey pixel`() {
+    fun `golden - Highlights(0_5) on bright-grey pixel`() {
         val out = Highlights(0.5f).apply(px(0.8f, 0.8f, 0.8f)).pixels
         assertNear(0.65f, out[0], epsilon = 0.002f, message = "R")
     }
@@ -142,7 +142,7 @@ class HighlightsShadowsTest {
     // ── Boundary at lum = 0.5 ─────────────────────────────────────────────────
 
     @Test
-    fun `Shadows does not affect mid-grey (lum = 0·5, influence = 0)`() {
+    fun `Shadows does not affect mid-grey (lum = 0_5, influence = 0)`() {
         // influence = max(0, 1 − 0.5×2) = 0
         val out = Shadows(0.5f).apply(px(0.5f, 0.5f, 0.5f)).pixels
         assertNear(0.5f, out[0], message = "R at boundary")
@@ -151,8 +151,8 @@ class HighlightsShadowsTest {
     }
 
     @Test
-    fun `Shadows does not affect bright pixel (lum above 0·5)`() {
-        // lum = 0.8 → influence = max(0, 1−0.8×2) = 0
+    fun `Shadows does not affect bright pixel (lum above 0_5)`() {
+        // lum = 0.8 to influence = max(0, 1−0.8×2) = 0
         val input = px(0.8f, 0.8f, 0.8f)
         assertContentEquals(input.pixels, Shadows(0.8f).apply(input).pixels)
     }
@@ -200,12 +200,12 @@ class HighlightsShadowsTest {
     // ── Golden pixel tests ────────────────────────────────────────────────────
     //
     // Shadows(0.5) on pure black (0, 0, 0, 1):
-    //   lum = 0 → influence = max(0, 1 − 0×2) = 1.0
+    //   lum = 0 to influence = max(0, 1 − 0×2) = 1.0
     //   lift = 0.5 × 1.0 × 0.5 = 0.25
     //   out = 0 + 0.25 = 0.25
 
     @Test
-    fun `golden - Shadows(0·5) lifts pure black`() {
+    fun `golden - Shadows(0_5) lifts pure black`() {
         val out = Shadows(0.5f).apply(px(0f, 0f, 0f)).pixels
         assertNear(0.25f, out[0], message = "R")
         assertNear(0.25f, out[1], message = "G")
@@ -213,21 +213,21 @@ class HighlightsShadowsTest {
         assertNear(1.0f,  out[3], message = "A")
     }
 
-    // Shadows(1.0) on black: lift = 1×1×0.5 = 0.5 → out = 0.5
+    // Shadows(1.0) on black: lift = 1×1×0.5 = 0.5 to out = 0.5
 
     @Test
-    fun `golden - Shadows(1·0) on black → 0·5`() {
+    fun `golden - Shadows(1_0) on black to 0_5`() {
         val out = Shadows(1f).apply(px(0f, 0f, 0f)).pixels
         assertNear(0.5f, out[0], message = "R at max lift")
     }
 
     // Shadows(0.5) on slightly-dark pixel (0.2, 0.2, 0.2):
-    //   lum = 0.2 → influence = max(0, 1 − 0.2×2) = 0.6
+    //   lum = 0.2 to influence = max(0, 1 − 0.2×2) = 0.6
     //   lift = 0.5 × 0.6 × 0.5 = 0.15
     //   out = 0.2 + 0.15 = 0.35
 
     @Test
-    fun `golden - Shadows(0·5) on dark-grey pixel`() {
+    fun `golden - Shadows(0_5) on dark-grey pixel`() {
         val out = Shadows(0.5f).apply(px(0.2f, 0.2f, 0.2f)).pixels
         assertNear(0.35f, out[0], epsilon = 0.002f, message = "R")
     }

@@ -54,13 +54,13 @@ class BrightnessTest {
     @Test
     fun `bright pixel clamped to 1`() {
         val out = Brightness(0.8f).apply(px(0.5f, 0.5f, 0.5f)).pixels
-        assertNear(1.0f, out[0])  // 0.5 + 0.8 = 1.3 → clamped
+        assertNear(1.0f, out[0])  // 0.5 + 0.8 = 1.3 to clamped
     }
 
     @Test
     fun `dark pixel clamped to 0`() {
         val out = Brightness(-0.8f).apply(px(0.3f, 0.3f, 0.3f)).pixels
-        assertNear(0.0f, out[0])  // 0.3 - 0.8 = -0.5 → clamped
+        assertNear(0.0f, out[0])  // 0.3 - 0.8 = -0.5 to clamped
     }
 
     // ── Alpha ─────────────────────────────────────────────────────────────────
@@ -90,7 +90,7 @@ class BrightnessTest {
     //   out_A = 1.0 (unchanged)
 
     @Test
-    fun `golden - Brightness(0·2) on known pixel`() {
+    fun `golden - Brightness(0_2) on known pixel`() {
         val out = Brightness(0.2f).apply(px(0.3f, 0.5f, 0.1f)).pixels
         assertNear(0.5f, out[0], message = "R")
         assertNear(0.7f, out[1], message = "G")

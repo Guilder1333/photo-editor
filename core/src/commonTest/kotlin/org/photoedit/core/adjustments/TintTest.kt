@@ -51,13 +51,13 @@ class TintTest {
     @Test
     fun `G does not go below 0 for strong magenta tint`() {
         val out = Tint(1f).apply(px(0.5f, 0.05f, 0.5f)).pixels
-        assertTrue(out[1] >= 0f, "G clamped to 0")  // 0.05 - 0.2 = -0.15 → 0
+        assertTrue(out[1] >= 0f, "G clamped to 0")  // 0.05 - 0.2 = -0.15 to 0
     }
 
     @Test
     fun `G does not exceed 1 for strong green tint`() {
         val out = Tint(-1f).apply(px(0.5f, 0.9f, 0.5f)).pixels
-        assertTrue(out[1] <= 1f, "G clamped to 1")  // 0.9 + 0.2 = 1.1 → 1.0
+        assertTrue(out[1] <= 1f, "G clamped to 1")  // 0.9 + 0.2 = 1.1 to 1.0
     }
 
     // ── Alpha ─────────────────────────────────────────────────────────────────
@@ -87,7 +87,7 @@ class TintTest {
     //   out_B = 0.5 (unchanged)
 
     @Test
-    fun `golden - Tint(0·5) magenta shift on grey`() {
+    fun `golden - Tint(0_5) magenta shift on grey`() {
         val out = Tint(0.5f).apply(px(0.5f, 0.5f, 0.5f)).pixels
         assertNear(0.5f, out[0], message = "R unchanged")
         assertNear(0.4f, out[1], message = "G (magenta)")
@@ -98,17 +98,17 @@ class TintTest {
     // Tint(-0.5) on (0.5, 0.5, 0.5): G = 0.5 + 0.1 = 0.6
 
     @Test
-    fun `golden - Tint(-0·5) green shift on grey`() {
+    fun `golden - Tint(-0_5) green shift on grey`() {
         val out = Tint(-0.5f).apply(px(0.5f, 0.5f, 0.5f)).pixels
         assertNear(0.5f, out[0], message = "R unchanged")
         assertNear(0.6f, out[1], message = "G (green)")
         assertNear(0.5f, out[2], message = "B unchanged")
     }
 
-    // Tint(1.0) on (0.4, 0.05, 0.6): G = 0.05 - 0.2 = -0.15 → 0.0
+    // Tint(1.0) on (0.4, 0.05, 0.6): G = 0.05 - 0.2 = -0.15 to 0.0
 
     @Test
-    fun `golden - Tint(1·0) clamps G to 0`() {
+    fun `golden - Tint(1_0) clamps G to 0`() {
         val out = Tint(1f).apply(px(0.4f, 0.05f, 0.6f)).pixels
         assertNear(0.4f, out[0], message = "R unchanged")
         assertNear(0.0f, out[1], message = "G clamped to 0")
