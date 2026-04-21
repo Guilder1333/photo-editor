@@ -41,3 +41,35 @@ interface ImageAdjustmentFeature {
 `ImageAdjustmentFeature` main interface for the adjustment feature. Execute is an async (can execute instantly) operation performing actual work on the image to make adjustments. `preview` is a faster version of it when user just moves slider and not yet ready to see final result, but want to see intermediate results. Usually will be used with image preview instad of full size, mask can be more rough, and so on.
 
 *Above structure is the approximate idea and a subject to change*
+
+# Step 2 Platform image I/O
+
+Codec bridges so each platform can load and export images to/from `ImageBuffer`:
+
+- Android: `Bitmap` ↔ `ImageBuffer`
+- iOS: `UIImage` ↔ `ImageBuffer`
+- Desktop (JVM): `BufferedImage` ↔ `ImageBuffer`
+
+Includes sRGB ↔ linear-light conversion at the boundary.
+
+# Step 3 More adjustments
+
+Expand the adjustment library before building UI:
+
+- **Whites / Blacks** — fine-grained tone range control (slots already reserved in `Order`)
+- **Curves** — per-channel tone curve (slot reserved in `Order`)
+- **HSL** — per-hue hue/saturation/luminance adjustments (slot reserved in `Order`)
+- **Crop / Straighten** — geometry adjustment (new `Order` slot needed)
+- **Vignette** — radial darkening/lightening around the edges
+- **Noise reduction** — smoothing pass for high-ISO shots
+- **Clarity** — mid-tone contrast / local contrast enhancement
+
+# Step 4 Preview / fast-path rendering
+
+A downscaled render path for slider drag feedback. The pipeline renders against a
+smaller `ImageBuffer` (e.g. screen resolution) while the user is dragging, then
+triggers a full-resolution render on release.
+
+# Step 5 UI layer
+
+Platform UI built on top of the completed core, I/O, and preview layers.
