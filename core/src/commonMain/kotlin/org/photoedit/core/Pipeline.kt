@@ -1,5 +1,8 @@
 package org.photoedit.core
 
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+
 /**
  * Immutable edit pipeline. Every mutating operation returns a new [Pipeline];
  * this makes undo/redo trivial (keep a stack of [Pipeline] snapshots).
@@ -23,6 +26,36 @@ class Pipeline(
             .sortedBy { it.order }
             .filterNot { it.isIdentity() }
         return active.fold(base) { img, adj -> adj.apply(img) }
+    }
+
+    /**
+     * Renders the pipeline asynchronously, emitting [RenderProgress.InProgress] after
+     * each adjustment completes, then [RenderProgress.Complete] with the final image.
+     *
+     * Use [kotlinx.coroutines.flow.flowOn] at the call site to run pixel work on a
+     * background dispatcher (e.g. `Dispatchers.Default`). The flow itself is cold and
+     * does no work until collected.
+     *
+     * Cancellation is cooperative: collection can be cancelled between adjustment steps.
+     */
+    fun renderAsync(): Flow<RenderProgress> = flow {
+        val base = checkpoints.lastOrNull()?.image ?: source
+        val active = adjustments.sortedBy { it.order }.filterNot { it.isIdentity() }
+        if (active.isEmpty()) {
+            emit(RenderProgress.Complete(base))
+            return@flow
+        }
+        var current = base
+        active.forEachIndexed { index, adj ->
+            current = adj.apply(current)
+            val step = index + 1
+            emit(RenderProgress.InProgress(
+                percent = step * 100 / active.size,
+                step = step,
+                total = active.size,
+            ))
+        }
+        emit(RenderProgress.Complete(current))
     }
 
     /**

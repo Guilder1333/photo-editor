@@ -24,10 +24,11 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            // No external dependencies for core yet.
+            implementation(libs.kotlinx.coroutines.core)
         }
         commonTest.dependencies {
             implementation(kotlin("test"))
+            implementation(libs.kotlinx.coroutines.test)
         }
     }
 }
