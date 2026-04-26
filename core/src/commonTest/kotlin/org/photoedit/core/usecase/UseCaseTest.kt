@@ -204,7 +204,7 @@ class UseCaseTest {
         session = undo(session)  // nothing more — stays put
         assertFalse(session.history.canUndo)
 
-        session = redo(session)  // +2 EV
-        assertEquals(2.0f, session.pipeline.render().pixels[0], 1e-5f)
+        session = redo(session)  // restores Exposure(1f): 0.5 × 2^1 = 1.0
+        assertEquals(1.0f, session.pipeline.render().pixels[0], 1e-5f)
     }
 }
