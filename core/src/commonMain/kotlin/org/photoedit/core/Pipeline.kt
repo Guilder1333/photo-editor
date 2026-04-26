@@ -22,10 +22,25 @@ class Pipeline(
      */
     fun render(): ImageBuffer {
         val base = checkpoints.lastOrNull()?.image ?: source
-        val active = adjustments
-            .sortedBy { it.order }
-            .filterNot { it.isIdentity() }
-        return active.fold(base) { img, adj -> adj.apply(img) }
+        return applyActive(base)
+    }
+
+    /**
+     * Renders a downscaled preview for fast slider feedback.
+     *
+     * The base image (source or last checkpoint) is downscaled with a box filter to
+     * fit within [maxWidth] × [maxHeight] before adjustments are applied. All
+     * adjustments run on the smaller buffer, so this is proportionally faster than a
+     * full render for large images.
+     *
+     * If the source already fits within the bounds, this is equivalent to [render].
+     *
+     * @param maxWidth  Maximum preview width in pixels.
+     * @param maxHeight Maximum preview height in pixels.
+     */
+    fun renderPreview(maxWidth: Int, maxHeight: Int): ImageBuffer {
+        val base = (checkpoints.lastOrNull()?.image ?: source).downscale(maxWidth, maxHeight)
+        return applyActive(base)
     }
 
     /**
@@ -38,8 +53,26 @@ class Pipeline(
      *
      * Cancellation is cooperative: collection can be cancelled between adjustment steps.
      */
-    fun renderAsync(): Flow<RenderProgress> = flow {
-        val base = checkpoints.lastOrNull()?.image ?: source
+    fun renderAsync(): Flow<RenderProgress> = renderAsyncInternal(base = checkpoints.lastOrNull()?.image ?: source)
+
+    /**
+     * Async variant of [renderPreview]. Downscales the base image before running
+     * adjustments, emitting progress after each step.
+     *
+     * @param maxWidth  Maximum preview width in pixels.
+     * @param maxHeight Maximum preview height in pixels.
+     */
+    fun renderPreviewAsync(maxWidth: Int, maxHeight: Int): Flow<RenderProgress> {
+        val base = (checkpoints.lastOrNull()?.image ?: source).downscale(maxWidth, maxHeight)
+        return renderAsyncInternal(base)
+    }
+
+    private fun applyActive(base: ImageBuffer): ImageBuffer {
+        val active = adjustments.sortedBy { it.order }.filterNot { it.isIdentity() }
+        return active.fold(base) { img, adj -> adj.apply(img) }
+    }
+
+    private fun renderAsyncInternal(base: ImageBuffer): Flow<RenderProgress> = flow {
         val active = adjustments.sortedBy { it.order }.filterNot { it.isIdentity() }
         if (active.isEmpty()) {
             emit(RenderProgress.Complete(base))
