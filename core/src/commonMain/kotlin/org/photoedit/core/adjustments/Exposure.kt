@@ -15,7 +15,7 @@ import org.photoedit.core.Order
  * @param ev Exposure value in stops. 0 = no change, +1 = one stop brighter,
  *           -1 = one stop darker.
  */
-class Exposure(private val ev: Float) : Adjustment {
+class Exposure(val ev: Float) : Adjustment {
     override val id = AdjustmentId("exposure")
     override val order = Order.EXPOSURE
     override fun isIdentity() = ev == 0f

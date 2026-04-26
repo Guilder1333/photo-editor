@@ -12,8 +12,8 @@ import kotlinx.coroutines.flow.flow
  * caching can be added later without changing the interface.
  */
 class Pipeline(
-    private val source: ImageBuffer,
-    private val adjustments: List<Adjustment> = emptyList(),
+    val source: ImageBuffer,
+    val adjustments: List<Adjustment> = emptyList(),
     private val checkpoints: List<Checkpoint> = emptyList(),
 ) {
     /**
