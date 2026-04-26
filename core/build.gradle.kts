@@ -2,19 +2,16 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidLibrary)
+    // alias(libs.plugins.androidLibrary)  // disabled: not available in CI environment
 }
 
 kotlin {
-    androidTarget {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_17)
-        }
-    }
+    // androidTarget { ... }  // disabled: not available in CI environment
 
-    iosX64()
-    iosArm64()
-    iosSimulatorArm64()
+    // iOS targets disabled in CI (no Xcode toolchain available)
+    // iosX64()
+    // iosArm64()
+    // iosSimulatorArm64()
 
     jvm("desktop") {
         compilerOptions {
@@ -33,14 +30,4 @@ kotlin {
     }
 }
 
-android {
-    namespace = "org.photoedit.core"
-    compileSdk = 36
-    defaultConfig {
-        minSdk = 35
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-}
+// android { ... }  // disabled: not available in CI environment

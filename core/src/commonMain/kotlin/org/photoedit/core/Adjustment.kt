@@ -16,20 +16,24 @@ value class AdjustmentId(val value: String)
  * would shift their results).
  */
 object Order {
-    const val EXPOSURE    = 100
-    const val BRIGHTNESS  = 150
-    const val CONTRAST    = 200
-    const val HIGHLIGHTS  = 300
-    const val SHADOWS     = 310
-    const val WHITES      = 320
-    const val BLACKS      = 330
-    const val CURVES      = 400
-    const val TEMPERATURE = 450
-    const val TINT        = 460
-    const val HSL         = 500
-    const val SATURATION  = 510
-    const val VIBRANCE    = 520
-    const val SHARPEN     = 900
+    const val CROP           =  50
+    const val EXPOSURE       = 100
+    const val BRIGHTNESS     = 150
+    const val CONTRAST       = 200
+    const val HIGHLIGHTS     = 300
+    const val SHADOWS        = 310
+    const val WHITES         = 320
+    const val BLACKS         = 330
+    const val CURVES         = 400
+    const val TEMPERATURE    = 450
+    const val TINT           = 460
+    const val HSL            = 500
+    const val SATURATION     = 510
+    const val VIBRANCE       = 520
+    const val CLARITY        = 600
+    const val NOISE_REDUCTION = 700
+    const val VIGNETTE       = 800
+    const val SHARPEN        = 900
     // Gaps leave room to insert new adjustments without renumbering.
 }
 

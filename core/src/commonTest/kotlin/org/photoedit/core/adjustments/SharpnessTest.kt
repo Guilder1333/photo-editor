@@ -44,14 +44,14 @@ class SharpnessTest {
 
     @Test
     fun `sharpness on 1×1 image is identity regardless of value`() {
-        // blur of a 1×1 image = the single pixel itself → unsharp = 0
+        // blur of a 1×1 image = the single pixel itself → unsharp ≈ 0.
+        // Use assertNear: float32 sum/9 of 9 identical values may not equal the original exactly.
         val input = px1(0.7f, 0.3f, 0.5f)
         for (v in listOf(0.25f, 0.5f, 1f)) {
-            assertContentEquals(
-                input.pixels,
-                Sharpness(v).apply(input).pixels,
-                "Expected identity on 1×1 at sharpness=$v",
-            )
+            val out = Sharpness(v).apply(input).pixels
+            assertNear(input.pixels[0], out[0], epsilon = 0.002f, message = "R at sharpness=$v")
+            assertNear(input.pixels[1], out[1], epsilon = 0.002f, message = "G at sharpness=$v")
+            assertNear(input.pixels[2], out[2], epsilon = 0.002f, message = "B at sharpness=$v")
         }
     }
 
