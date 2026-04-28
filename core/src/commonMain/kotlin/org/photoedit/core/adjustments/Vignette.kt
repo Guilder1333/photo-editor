@@ -2,6 +2,7 @@ package org.photoedit.core.adjustments
 
 import org.photoedit.core.Adjustment
 import org.photoedit.core.AdjustmentId
+import org.photoedit.core.AdjustmentType
 import org.photoedit.core.ImageBuffer
 import org.photoedit.core.Order
 import kotlin.math.sqrt
@@ -29,6 +30,7 @@ class Vignette(val strength: Float, val feather: Float = 0.5f) : Adjustment {
     override val id = AdjustmentId("vignette")
     override val order = Order.VIGNETTE
     override fun isIdentity() = strength == 0f
+    override fun toFields() = listOf("strength" to strength, "feather" to feather)
 
     override fun apply(input: ImageBuffer): ImageBuffer {
         val w = input.width
@@ -59,5 +61,11 @@ class Vignette(val strength: Float, val feather: Float = 0.5f) : Adjustment {
             }
         }
         return ImageBuffer(w, h, out)
+    }
+
+    companion object : AdjustmentType {
+        override val typeKey = "vignette"
+        override fun fromFields(fields: Map<String, String?>) =
+            Vignette(fields["strength"]!!.toFloat(), fields["feather"]?.toFloat() ?: 0.5f)
     }
 }

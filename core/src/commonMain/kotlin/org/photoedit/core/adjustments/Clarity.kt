@@ -2,6 +2,7 @@ package org.photoedit.core.adjustments
 
 import org.photoedit.core.Adjustment
 import org.photoedit.core.AdjustmentId
+import org.photoedit.core.AdjustmentType
 import org.photoedit.core.ImageBuffer
 import org.photoedit.core.LUM_B
 import org.photoedit.core.LUM_G
@@ -30,6 +31,7 @@ class Clarity(val value: Float) : Adjustment {
     override val id = AdjustmentId("clarity")
     override val order = Order.CLARITY
     override fun isIdentity() = value == 0f
+    override fun toFields() = listOf("value" to value)
 
     override fun apply(input: ImageBuffer): ImageBuffer {
         val w = input.width
@@ -70,5 +72,10 @@ class Clarity(val value: Float) : Adjustment {
             i += 4
         }
         return ImageBuffer(w, h, out)
+    }
+
+    companion object : AdjustmentType {
+        override val typeKey = "clarity"
+        override fun fromFields(fields: Map<String, String?>) = Clarity(fields["value"]!!.toFloat())
     }
 }

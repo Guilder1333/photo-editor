@@ -2,6 +2,7 @@ package org.photoedit.core.adjustments
 
 import org.photoedit.core.Adjustment
 import org.photoedit.core.AdjustmentId
+import org.photoedit.core.AdjustmentType
 import org.photoedit.core.ImageBuffer
 import org.photoedit.core.Order
 import kotlin.math.sqrt
@@ -36,6 +37,12 @@ class Curves(
     private val blueLut  = blue?.let  { if (isIdentityCurve(it)) null else buildLut(it) }
 
     override fun isIdentity() = rgbLut == null && redLut == null && greenLut == null && blueLut == null
+    override fun toFields() = listOf(
+        "rgb"   to encodeCurve(rgb),
+        "red"   to red?.let { encodeCurve(it) },
+        "green" to green?.let { encodeCurve(it) },
+        "blue"  to blue?.let { encodeCurve(it) },
+    )
 
     override fun apply(input: ImageBuffer): ImageBuffer {
         val p = input.pixels
@@ -56,7 +63,24 @@ class Curves(
         return ImageBuffer(input.width, input.height, out)
     }
 
-    companion object {
+    companion object : AdjustmentType {
+        override val typeKey = "curves"
+
+        fun encodeCurve(curve: List<Pair<Float, Float>>): String =
+            curve.joinToString(" ") { (x, y) -> "$x $y" }
+
+        private fun decodeCurve(s: String): List<Pair<Float, Float>> {
+            val nums = s.trim().split(" ").filter { it.isNotEmpty() }.map { it.toFloat() }
+            return (nums.indices step 2).map { nums[it] to nums[it + 1] }
+        }
+
+        override fun fromFields(fields: Map<String, String?>) = Curves(
+            rgb   = decodeCurve(fields["rgb"]!!),
+            red   = fields["red"]?.let(::decodeCurve),
+            green = fields["green"]?.let(::decodeCurve),
+            blue  = fields["blue"]?.let(::decodeCurve),
+        )
+
         val IDENTITY: List<Pair<Float, Float>> = listOf(0f to 0f, 1f to 1f)
 
         fun isIdentityCurve(points: List<Pair<Float, Float>>): Boolean {

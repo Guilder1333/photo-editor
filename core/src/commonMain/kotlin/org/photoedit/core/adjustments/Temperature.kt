@@ -2,6 +2,7 @@ package org.photoedit.core.adjustments
 
 import org.photoedit.core.Adjustment
 import org.photoedit.core.AdjustmentId
+import org.photoedit.core.AdjustmentType
 import org.photoedit.core.ImageBuffer
 import org.photoedit.core.Order
 
@@ -18,6 +19,7 @@ class Temperature(val value: Float) : Adjustment {
     override val id = AdjustmentId("temperature")
     override val order = Order.TEMPERATURE
     override fun isIdentity() = value == 0f
+    override fun toFields() = listOf("value" to value)
 
     override fun apply(input: ImageBuffer): ImageBuffer {
         val shift = value * SCALE
@@ -34,7 +36,10 @@ class Temperature(val value: Float) : Adjustment {
         return ImageBuffer(input.width, input.height, out)
     }
 
-    companion object {
+    companion object : AdjustmentType {
+        override val typeKey = "temperature"
+        override fun fromFields(fields: Map<String, String?>) = Temperature(fields["value"]!!.toFloat())
+
         /** Maximum per-channel shift: value=±1 applies ±SCALE to R/B. */
         const val SCALE = 0.2f
     }

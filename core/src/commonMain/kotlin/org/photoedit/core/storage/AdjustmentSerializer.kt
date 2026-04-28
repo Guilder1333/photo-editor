@@ -1,14 +1,17 @@
 package org.photoedit.core.storage
 
 import org.photoedit.core.Adjustment
-import org.photoedit.core.adjustments.*
-import kotlin.reflect.KClass
+import org.photoedit.core.AdjustmentRegistry
 
 /**
- * Hand-crafted JSON serializer for [Adjustment] lists.
+ * JSON serializer for [Adjustment] lists.
  *
- * New adjustment types are supported by adding one entry to [registry] — no type checks
- * anywhere else in this file need to change.
+ * Encoding delegates to each adjustment's own [Adjustment.toFields] and [Adjustment.typeKey].
+ * Decoding looks up the type key in [AdjustmentRegistry] and delegates to the matching
+ * [org.photoedit.core.AdjustmentType.fromFields].
+ *
+ * Adding a new adjustment type requires no changes here — only adding the companion object
+ * to [AdjustmentRegistry] and implementing [Adjustment.toFields] on the class.
  *
  * Example output:
  * ```json
@@ -17,107 +20,23 @@ import kotlin.reflect.KClass
  */
 object AdjustmentSerializer {
 
-    // ── Codec registry ────────────────────────────────────────────────────────
-
-    private class Codec<T : Adjustment>(
-        val typeKey: String,
-        val klass: KClass<T>,
-        private val toFields: (T) -> List<Pair<String, Any?>>,
-        val fromFields: (Map<String, String?>) -> T,
-    ) {
-        @Suppress("UNCHECKED_CAST")
-        fun encodeUnchecked(adj: Adjustment): List<Pair<String, Any?>> = toFields(adj as T)
-    }
-
-    private fun <T : Adjustment> codec(
-        typeKey: String,
-        klass: KClass<T>,
-        toFields: (T) -> List<Pair<String, Any?>>,
-        fromFields: (Map<String, String?>) -> T,
-    ): Codec<T> = Codec(typeKey, klass, toFields, fromFields)
-
-    private val registry: List<Codec<*>> = listOf(
-        codec("exposure",        Exposure::class,       { listOf("ev"       to it.ev) },       { Exposure(it.float("ev")) }),
-        codec("brightness",      Brightness::class,     { listOf("value"    to it.value) },    { Brightness(it.float("value")) }),
-        codec("contrast",        Contrast::class,       { listOf("value"    to it.value) },    { Contrast(it.float("value")) }),
-        codec("highlights",      Highlights::class,     { listOf("value"    to it.value) },    { Highlights(it.float("value")) }),
-        codec("shadows",         Shadows::class,        { listOf("value"    to it.value) },    { Shadows(it.float("value")) }),
-        codec("whites",          Whites::class,         { listOf("value"    to it.value) },    { Whites(it.float("value")) }),
-        codec("blacks",          Blacks::class,         { listOf("value"    to it.value) },    { Blacks(it.float("value")) }),
-        codec("temperature",     Temperature::class,    { listOf("value"    to it.value) },    { Temperature(it.float("value")) }),
-        codec("tint",            Tint::class,           { listOf("value"    to it.value) },    { Tint(it.float("value")) }),
-        codec("saturation",      Saturation::class,     { listOf("value"    to it.value) },    { Saturation(it.float("value")) }),
-        codec("vibrance",        Vibrance::class,       { listOf("value"    to it.value) },    { Vibrance(it.float("value")) }),
-        codec("sharpness",       Sharpness::class,      { listOf("value"    to it.value) },    { Sharpness(it.float("value")) }),
-        codec("clarity",         Clarity::class,        { listOf("value"    to it.value) },    { Clarity(it.float("value")) }),
-        codec("noise_reduction", NoiseReduction::class, { listOf("strength" to it.strength) }, { NoiseReduction(it.float("strength")) }),
-        codec("vignette", Vignette::class,
-            { listOf("strength" to it.strength, "feather" to it.feather) },
-            { Vignette(it.float("strength"), it.floatOr("feather", 0.5f)) },
-        ),
-        codec("crop", Crop::class,
-            { listOf("left" to it.left, "top" to it.top, "right" to it.right, "bottom" to it.bottom) },
-            { Crop(it.floatOr("left", 0f), it.floatOr("top", 0f), it.floatOr("right", 0f), it.floatOr("bottom", 0f)) },
-        ),
-        codec("curves", Curves::class,
-            { listOf(
-                "rgb"   to encodeCurve(it.rgb),
-                "red"   to it.red?.let(::encodeCurve),
-                "green" to it.green?.let(::encodeCurve),
-                "blue"  to it.blue?.let(::encodeCurve),
-            ) },
-            { Curves(
-                rgb   = decodeCurve(it.str("rgb")),
-                red   = it["red"]?.let(::decodeCurve),
-                green = it["green"]?.let(::decodeCurve),
-                blue  = it["blue"]?.let(::decodeCurve),
-            ) },
-        ),
-        codec("hsl", Hsl::class,
-            { listOf(
-                "hs" to encodeFloatArray(it.hueShifts),
-                "ss" to encodeFloatArray(it.saturationShifts),
-                "ls" to encodeFloatArray(it.lightnessShifts),
-            ) },
-            { Hsl(
-                hueShifts        = decodeFloatArray(it.str("hs")),
-                saturationShifts = decodeFloatArray(it.str("ss")),
-                lightnessShifts  = decodeFloatArray(it.str("ls")),
-            ) },
-        ),
-    )
-
-    private val byClass: Map<KClass<*>, Codec<*>> = registry.associateBy { it.klass }
-    private val byTypeKey: Map<String, Codec<*>> = registry.associateBy { it.typeKey }
-
-    // ── Field reader helpers ───────────────────────────────────────────────────
-
-    private fun Map<String, String?>.float(key: String) = getValue(key)!!.toFloat()
-    private fun Map<String, String?>.floatOr(key: String, default: Float) = get(key)?.toFloat() ?: default
-    private fun Map<String, String?>.str(key: String) = getValue(key)!!
+    private val byTypeKey = AdjustmentRegistry.all.associateBy { it.typeKey }
 
     // ── Encode ────────────────────────────────────────────────────────────────
 
     fun toJson(adjustments: List<Adjustment>): String =
-        "[${adjustments.joinToString(",") { encode(it) }}]"
-
-    private fun encode(adj: Adjustment): String {
-        val codec = checkNotNull(byClass[adj::class]) { "No codec registered for ${adj::class.simpleName}" }
-        return buildObj(codec.typeKey, codec.encodeUnchecked(adj))
-    }
+        "[${adjustments.joinToString(",") { buildObj(it.typeKey, it.toFields()) }}]"
 
     // ── Decode ────────────────────────────────────────────────────────────────
 
     fun fromJson(json: String): List<Adjustment> =
-        parseObjectArray(json.trim()).map { decode(it) }
+        parseObjectArray(json.trim()).map { fields ->
+            val type = fields["type"]
+            val factory = checkNotNull(byTypeKey[type]) { "Unknown adjustment type in JSON: $type" }
+            factory.fromFields(fields)
+        }
 
-    private fun decode(fields: Map<String, String?>): Adjustment {
-        val type = fields["type"]
-        val codec = checkNotNull(byTypeKey[type]) { "Unknown adjustment type in JSON: $type" }
-        return codec.fromFields(fields)
-    }
-
-    // ── JSON building helpers ─────────────────────────────────────────────────
+    // ── JSON building ─────────────────────────────────────────────────────────
 
     private fun buildObj(type: String, fields: List<Pair<String, Any?>>): String {
         val sb = StringBuilder("{\"type\":\"$type\"")
@@ -133,11 +52,6 @@ object AdjustmentSerializer {
         sb.append("}")
         return sb.toString()
     }
-
-    private fun encodeCurve(curve: List<Pair<Float, Float>>): String =
-        curve.joinToString(" ") { (x, y) -> "$x $y" }
-
-    private fun encodeFloatArray(arr: FloatArray): String = arr.joinToString(" ")
 
     // ── JSON parser ───────────────────────────────────────────────────────────
 
@@ -206,12 +120,4 @@ object AdjustmentSerializer {
         }
         return result
     }
-
-    private fun decodeCurve(encoded: String): List<Pair<Float, Float>> {
-        val nums = encoded.trim().split(" ").filter { it.isNotEmpty() }.map { it.toFloat() }
-        return (nums.indices step 2).map { nums[it] to nums[it + 1] }
-    }
-
-    private fun decodeFloatArray(encoded: String): FloatArray =
-        encoded.trim().split(" ").filter { it.isNotEmpty() }.map { it.toFloat() }.toFloatArray()
 }

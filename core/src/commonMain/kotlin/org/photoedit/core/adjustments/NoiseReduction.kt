@@ -2,6 +2,7 @@ package org.photoedit.core.adjustments
 
 import org.photoedit.core.Adjustment
 import org.photoedit.core.AdjustmentId
+import org.photoedit.core.AdjustmentType
 import org.photoedit.core.ImageBuffer
 import org.photoedit.core.Order
 
@@ -19,6 +20,7 @@ class NoiseReduction(val strength: Float) : Adjustment {
     override val id = AdjustmentId("noise_reduction")
     override val order = Order.NOISE_REDUCTION
     override fun isIdentity() = strength == 0f
+    override fun toFields() = listOf("strength" to strength)
 
     override fun apply(input: ImageBuffer): ImageBuffer {
         val w = input.width
@@ -74,5 +76,10 @@ class NoiseReduction(val strength: Float) : Adjustment {
             i += 4
         }
         return ImageBuffer(w, h, out)
+    }
+
+    companion object : AdjustmentType {
+        override val typeKey = "noise_reduction"
+        override fun fromFields(fields: Map<String, String?>) = NoiseReduction(fields["strength"]!!.toFloat())
     }
 }

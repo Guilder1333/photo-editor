@@ -2,6 +2,7 @@ package org.photoedit.core.adjustments
 
 import org.photoedit.core.Adjustment
 import org.photoedit.core.AdjustmentId
+import org.photoedit.core.AdjustmentType
 import org.photoedit.core.ImageBuffer
 import org.photoedit.core.Order
 
@@ -20,6 +21,7 @@ class Sharpness(val value: Float) : Adjustment {
     override val id = AdjustmentId("sharpness")
     override val order = Order.SHARPEN
     override fun isIdentity() = value == 0f
+    override fun toFields() = listOf("value" to value)
 
     override fun apply(input: ImageBuffer): ImageBuffer {
         val w = input.width
@@ -57,5 +59,10 @@ class Sharpness(val value: Float) : Adjustment {
             i += 4
         }
         return ImageBuffer(w, h, out)
+    }
+
+    companion object : AdjustmentType {
+        override val typeKey = "sharpness"
+        override fun fromFields(fields: Map<String, String?>) = Sharpness(fields["value"]!!.toFloat())
     }
 }

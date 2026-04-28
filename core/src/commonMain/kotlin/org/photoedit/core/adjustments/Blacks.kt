@@ -2,6 +2,7 @@ package org.photoedit.core.adjustments
 
 import org.photoedit.core.Adjustment
 import org.photoedit.core.AdjustmentId
+import org.photoedit.core.AdjustmentType
 import org.photoedit.core.ImageBuffer
 import org.photoedit.core.LUM_B
 import org.photoedit.core.LUM_G
@@ -27,6 +28,7 @@ class Blacks(val value: Float) : Adjustment {
     override val id = AdjustmentId("blacks")
     override val order = Order.BLACKS
     override fun isIdentity() = value == 0f
+    override fun toFields() = listOf("value" to value)
 
     override fun apply(input: ImageBuffer): ImageBuffer {
         val p = input.pixels
@@ -44,5 +46,10 @@ class Blacks(val value: Float) : Adjustment {
             i += 4
         }
         return ImageBuffer(input.width, input.height, out)
+    }
+
+    companion object : AdjustmentType {
+        override val typeKey = "blacks"
+        override fun fromFields(fields: Map<String, String?>) = Blacks(fields["value"]!!.toFloat())
     }
 }

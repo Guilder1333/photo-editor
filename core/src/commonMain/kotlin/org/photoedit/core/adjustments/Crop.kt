@@ -2,6 +2,7 @@ package org.photoedit.core.adjustments
 
 import org.photoedit.core.Adjustment
 import org.photoedit.core.AdjustmentId
+import org.photoedit.core.AdjustmentType
 import org.photoedit.core.ImageBuffer
 import org.photoedit.core.Order
 
@@ -30,6 +31,7 @@ class Crop(
     override val id = AdjustmentId("crop")
     override val order = Order.CROP
     override fun isIdentity() = left == 0f && top == 0f && right == 0f && bottom == 0f
+    override fun toFields() = listOf("left" to left, "top" to top, "right" to right, "bottom" to bottom)
 
     override fun apply(input: ImageBuffer): ImageBuffer {
         val srcW = input.width
@@ -57,5 +59,15 @@ class Crop(
             p.copyInto(out, dstRow, srcRow, srcRow + dstW * 4)
         }
         return ImageBuffer(dstW, dstH, out)
+    }
+
+    companion object : AdjustmentType {
+        override val typeKey = "crop"
+        override fun fromFields(fields: Map<String, String?>) = Crop(
+            left   = fields["left"]?.toFloat()   ?: 0f,
+            top    = fields["top"]?.toFloat()    ?: 0f,
+            right  = fields["right"]?.toFloat()  ?: 0f,
+            bottom = fields["bottom"]?.toFloat() ?: 0f,
+        )
     }
 }
