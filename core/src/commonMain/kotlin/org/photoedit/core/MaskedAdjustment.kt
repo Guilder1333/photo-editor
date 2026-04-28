@@ -23,6 +23,7 @@ class MaskedAdjustment(
     override val id: AdjustmentId get() = adjustment.id
     override val order: Int get() = adjustment.order
     override fun isIdentity(): Boolean = adjustment.isIdentity()
+    override fun toFields(): List<Pair<String, Any?>> = adjustment.toFields()
 
     override fun apply(input: ImageBuffer): ImageBuffer {
         require(mask.width == input.width && mask.height == input.height) {
