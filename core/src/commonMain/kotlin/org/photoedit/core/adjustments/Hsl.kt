@@ -2,6 +2,7 @@ package org.photoedit.core.adjustments
 
 import org.photoedit.core.Adjustment
 import org.photoedit.core.AdjustmentId
+import org.photoedit.core.AdjustmentType
 import org.photoedit.core.ImageBuffer
 import org.photoedit.core.Order
 import kotlin.math.abs
@@ -33,6 +34,11 @@ class Hsl(
         hueShifts.all        { it == 0f } &&
         saturationShifts.all { it == 0f } &&
         lightnessShifts.all  { it == 0f }
+    override fun toFields() = listOf(
+        "hs" to encodeFloatArray(hueShifts),
+        "ss" to encodeFloatArray(saturationShifts),
+        "ls" to encodeFloatArray(lightnessShifts),
+    )
 
     override fun apply(input: ImageBuffer): ImageBuffer {
         val p = input.pixels
@@ -70,7 +76,20 @@ class Hsl(
         return ImageBuffer(input.width, input.height, out)
     }
 
-    companion object {
+    companion object : AdjustmentType {
+        override val typeKey = "hsl"
+
+        fun encodeFloatArray(arr: FloatArray): String = arr.joinToString(" ")
+
+        private fun decodeFloatArray(s: String): FloatArray =
+            s.trim().split(" ").filter { it.isNotEmpty() }.map { it.toFloat() }.toFloatArray()
+
+        override fun fromFields(fields: Map<String, String?>) = Hsl(
+            hueShifts        = decodeFloatArray(fields["hs"]!!),
+            saturationShifts = decodeFloatArray(fields["ss"]!!),
+            lightnessShifts  = decodeFloatArray(fields["ls"]!!),
+        )
+
         // Hue range centers in [0, 1) — each center is separated by 1/8 (45°).
         private val HUE_CENTERS = FloatArray(8) { it / 8f }
         private const val HUE_WIDTH = 1f / 8f  // influence half-width (45°)

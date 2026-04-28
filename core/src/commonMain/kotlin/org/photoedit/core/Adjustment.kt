@@ -50,6 +50,8 @@ object Order {
 interface Adjustment {
     val id: AdjustmentId
     val order: Int
+    val typeKey: String get() = id.value
     fun isIdentity(): Boolean
     fun apply(input: ImageBuffer): ImageBuffer
+    fun toFields(): List<Pair<String, Any?>>
 }
